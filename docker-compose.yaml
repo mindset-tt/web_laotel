@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  app:
+    image: "registry.gitlab.com/mindset-tt/form_laotel"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app/config/static/uploads
+    restart: on-failure
