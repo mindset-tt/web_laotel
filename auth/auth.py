@@ -1,4 +1,4 @@
-import jwt
+from jose import jwt
 from datetime import timezone
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
