@@ -1,5 +1,3 @@
-from logging import root
-from sshtunnel import SSHTunnelForwarder
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from pymysql import cursors, connect
@@ -13,15 +11,12 @@ from fastapi.openapi.docs import (
     get_swagger_ui_html,
     get_swagger_ui_oauth2_redirect_html,
 )
-tunnel = SSHTunnelForwarder(('52.220.74.160', 22), ssh_password="123456Aa!",
-                            ssh_username="ubuntu", remote_bind_address=("127.0.0.1", 3306))
-tunnel.start()
 conp = connect(host='127.0.0.1', user="root", passwd="123456Aa!",
-               database="pos", port=tunnel.local_bind_port)
+               database="pos", port=3306)
 
 
 engine = create_engine(
-    f"mysql://root:123456Aa!@127.0.0.1:{tunnel.local_bind_port}/pos")
+    f"mysql://root:123456Aa!@127.0.0.1:{3306}/pos")
 
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False,)
@@ -52,7 +47,7 @@ app.add_middleware(
 
 @app.get('/myproject1/display/{filename}', tags=['ຮູບພະນັກງານ'])
 async def display(filename: str):
-    file_path = os.path.join(f"/home/took/myproject/config/static/uploads/{filename}")
+    file_path = os.path.join(f"/home/took/myproject/fastapi/config/static/uploads/{filename}")
     if (filename.endswith('.png')):
         return FileResponse(file_path, media_type="image/png", filename=filename)
     elif (filename.endswith('.jpg')) or (filename.endswith('.jpeg')):

@@ -12,6 +12,7 @@ from .position import position_name
 from .session import session_name
 from .province import province_name
 import os
+from requests import get
 from werkzeug.utils import secure_filename
 from pydantic import BaseModel
 from typing import Optional
@@ -27,10 +28,11 @@ def allowed_file(filename):
 async def employee(public_id=Depends(auth_handler.auth_wrapper)):
     try:
         cursor.execute("SELECT d1.emp_ID, d1.gender, d1.emp_name, d1.emp_surname,\
-             d1.emp_tel, d1.village, d1.district, d1.profilepic, d4.province, d3.dep_name, d2.pos_name\
+             d1.emp_tel, d1.village, d1.district, d1.profilepic, d4.province, d3.dep_name, d2.pos_name, d6.session_name\
               from employee as d1 inner join position as d2 on (d1.pos_ID=d2.pos_ID)\
                 inner join department as d3 on(d1.dep_ID=d3.dep_ID) \
-                inner join province as d4 on(d1.prov_ID=d4.prov_ID) WHERE d1.status = 2")
+                inner join province as d4 on(d1.prov_ID=d4.prov_ID)\
+                    inner join session as d6 on(d1.session_ID=d6.session_ID) WHERE d1.status = 2")
         empRows = cursor.fetchall()
         return JSONResponse(status_code=200, content={"employee": empRows})
 
@@ -73,7 +75,7 @@ async def create_employee(emp_ID: str = Form(...),
         _prov = province_name(prov_name)
         filename = files.filename
         secure_filename = str(uuid.uuid1())
-        filesave = os.path.join("/app/config/static/uploads", str(f"{secure_filename}_{filename}"))
+        filesave = os.path.join("/home/took/myproject/fastapi/config/static/uploads", str(f"{secure_filename}_{filename}"))
         print(filesave)
         async with aiofiles.open(filesave, 'wb') as fh:
             while True:
@@ -82,10 +84,11 @@ async def create_employee(emp_ID: str = Form(...),
                     break
                 await fh.write(chunk)
         print(_dep)
+        ip = get('https://api.ipify.org').text
         sqlQuery = "INSERT INTO employee(emp_ID, emp_name, emp_surname, \
                 gender, emp_tel, village, district, pos_ID, dep_ID, prov_ID, session_ID, status, profilepic) \
                     VALUES(%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        bindData = emp_ID, emp_name, emp_surname, gender, emp_tel, village, district, _pos, _dep, _prov, _ses, "ຍັງບໍ່ອອກ", f"http://47.250.49.41/display/{secure_filename}_{filename}"
+        bindData = emp_ID, emp_name, emp_surname, gender, emp_tel, village, district, _pos, _dep, _prov, _ses, "ຍັງບໍ່ອອກ", f"http://{ip}/display/{secure_filename}_{filename}"
         cursor.execute(sqlQuery, bindData)
         conp.commit()
         password = 'password'
@@ -144,7 +147,7 @@ async def update_employee(emp_ID: str = Form(...),
                 filename = files.filename
                 secure_filename = str(uuid.uuid1())
                 filesave = os.path.join(
-                    "/app/config/static/uploads", str(filename))
+                    "/home/took/myproject/fastapi/config/static/uploads", str(filename))
                 print(filesave)
                 async with aiofiles.open(filesave, 'wb') as fh:
                     while True:
@@ -156,7 +159,7 @@ async def update_employee(emp_ID: str = Form(...),
                 sqlQuery = "UPDATE employee SET emp_name = %s, emp_surname = %s, gender = %s, \
                     emp_tel = %s, village = %s, district = %s, pos_ID = %s, session_ID = %s, dep_ID = %s, \
                             prov_ID = %s, status = 2, profilepic = %s  WHERE (emp_ID = %s)"
-                bindData = emp_name, emp_surname, gender, emp_tel, village, district, _pos, _ses, _dep, _prov, f"http://47.250.49.41/display/{secure_filename}_{filename}", emp_ID
+                bindData = emp_name, emp_surname, gender, emp_tel, village, district, _pos, _ses, _dep, _prov, f"http://192.168.100.77/display/{secure_filename}_{filename}", emp_ID
             cursor.execute(sqlQuery, bindData)
             conp.commit()
             respone = JSONResponse(
@@ -196,10 +199,11 @@ async def employee_only_10(page: int, public_id=Depends(auth_handler.auth_wrappe
             d = 5 * page
             print(d)
         cursor.execute("SELECT d1.emp_ID, d1.gender, d1.emp_name, d1.emp_surname,\
-                d1.emp_tel, d1.village, d1.district, d1.profilepic, d4.province, d3.dep_name, d2.pos_name\
+                d1.emp_tel, d1.village, d1.district, d1.profilepic, d4.province, d3.dep_name, d2.pos_name, d6.session_name\
                 from employee as d1 inner join position as d2 on (d1.pos_ID=d2.pos_ID)\
                 inner join department as d3 on(d1.dep_ID=d3.dep_ID) \
-                inner join province as d4 on(d1.prov_ID=d4.prov_ID) WHERE d1.status = 2 limit 10 offset %s", d)
+                inner join province as d4 on(d1.prov_ID=d4.prov_ID)]\
+                    inner join session as d6 on(d1.session_ID=d6.session_ID) WHERE d1.status = 2 limit 10 offset %s", d)
         empRows = cursor.fetchall()
         return JSONResponse(status_code=200, content={"employee": empRows})
 

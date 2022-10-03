@@ -47,35 +47,42 @@ async def detail_form(header_name: str, public_id=Depends(auth_handler.auth_wrap
 @app.post('/myproject1/header_form' , tags=['ແບບຟອມ'])
 async def create_form(info: Assessment, public_id=Depends(auth_handler.auth_wrapper)):
     # sourcery skip: avoid-builtin-shadow, hoist-statement-from-loop
-    sql = "INSERT INTO header_form (head_name, emp_ID) VALUES (%s, %s)"
-    sql_where = (info.head_name, info.emp_ID)
-    cursor.execute(sql, sql_where)
-    conp.commit()
-    sql = "SELECT head_ID FROM header_form WHERE head_name = %s"
+    sql = "SELECT head_name FROM header_form WHERE head_name = %s"
     sql_where = (info.head_name)
     cursor.execute(sql, sql_where)
-    id = cursor.fetchone()
-    id = id['head_ID']
-    for i in range(len(info.title1)):
-        title1 = info.title1[i].title1_name
-        sql = "INSERT INTO header_title1 (title1_name, head_ID) VALUES (%s, %s)"
-        sql_where = (title1, id)
+    h_name = cursor.fetchall()
+    if h_name:
+        return JSONResponse(status_code=400, content={"message": "ຊື່ຟອມນີ້ມີແລ້ວ"})
+    else:
+        sql = "INSERT INTO header_form (head_name, emp_ID) VALUES (%s, %s)"
+        sql_where = (info.head_name, info.emp_ID)
         cursor.execute(sql, sql_where)
         conp.commit()
-        sql = "SELECT title1_ID FROM header_title1 WHERE title1_name = %s"
-        sql_where = (info.title1[i].title1_name)
+        sql = "SELECT head_ID FROM header_form WHERE head_name = %s"
+        sql_where = (info.head_name)
         cursor.execute(sql, sql_where)
-        ida = cursor.fetchone()
-        idsa = ida['title1_ID']
-        for j in range(len(info.title1[i].title2)):
-            sql = "INSERT INTO header_title2 (title2_name, title1_ID) VALUES (%s, %s)"
-            sql_where = [(info.title1[i].title2[j].title2_name, idsa)]
-            cursor.executemany(sql, sql_where)
+        id = cursor.fetchone()
+        id = id['head_ID']
+        for i in range(len(info.title1)):
+            title1 = info.title1[i].title1_name
+            sql = "INSERT INTO header_title1 (title1_name, head_ID) VALUES (%s, %s)"
+            sql_where = (title1, id)
+            cursor.execute(sql, sql_where)
             conp.commit()
-    return JSONResponse(
-        status_code=201,
-        content={"message": 'ສາ້ງແບບຟອມສຳເລັດ', 'status': 'ok'}
-    )
+            sql = "SELECT title1_ID FROM header_title1 WHERE title1_name = %s and head_ID = %s"
+            sql_where = (info.title1[i].title1_name, id)
+            cursor.execute(sql, sql_where)
+            ida = cursor.fetchone()
+            idsa = ida['title1_ID']
+            for j in range(len(info.title1[i].title2)):
+                sql = "INSERT INTO header_title2 (title2_name, title1_ID) VALUES (%s, %s)"
+                sql_where = [(info.title1[i].title2[j].title2_name, idsa)]
+                cursor.executemany(sql, sql_where)
+                conp.commit()
+        return JSONResponse(
+            status_code=201,
+            content={"message": 'ສາ້ງແບບຟອມສຳເລັດ', 'status': 'ok'}
+        )
 
 
 @app.put('/myproject1/header_form', tags=['ແບບຟອມ'])

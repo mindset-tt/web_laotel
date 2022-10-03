@@ -12,7 +12,8 @@ from CRUD.session import session_name
 async def view_moving(public_id=Depends(auth_handler.auth_wrapper)):
     try:
         cursor.execute("SELECT  d1.emp_ID, d2.emp_name, d2.emp_surname, d3.dep_name,\
-             d4.session_name, d5.pos_name, d1.description, DATE_FORMAT(d1.moving_date, '%Y-%m-%d') as moving_date, d6.dep_name, d7.session_name, d8.pos_name \
+             d4.session_name, d5.pos_name, d1.description, DATE_FORMAT(d1.moving_date, '%Y-%m-%d') as moving_date, \
+                d6.dep_name as dep_name_new, d7.session_name as session_name_new, d8.pos_name as pos_name_new \
             FROM moving as d1 inner join employee as d2 on (d1.emp_ID = d2.emp_ID) \
                 inner join department as d3 on (d1.dep_ID = d3.dep_ID) \
                     inner join session as d4 on (d1.session_ID = d4.session_ID) \

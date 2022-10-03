@@ -1,0 +1,14 @@
+{
+    "builds": [
+        {
+            "src": "/fastapi/main.py",
+            "use": "@now/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "fastapi/main.py"
+        }
+    ]
+}

@@ -6,6 +6,7 @@ from config.config_db import app, cursor, auth_handler
 from auth.auth import AuthHandler
 import uvicorn
 
+
 if __name__ == '__main__':
     uvicorn.run(
         "main:app",

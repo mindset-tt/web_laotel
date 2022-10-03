@@ -1,5 +1,3 @@
-from pickle import TRUE
-from warnings import catch_warnings
 from config.config_db import app, cursor, SECRET_KEY, conp, auth_handler
 from re import match
 from model.model import forgot_password, login
