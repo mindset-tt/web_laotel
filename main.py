@@ -2,7 +2,7 @@ from CRUD import employee
 # from asessment_form import assesment_form
 # from model import model
 # from Organization_Chart import moving
-from config.config_db import app, cursor, auth_handler
+from config.config_db import app, cursor, conp
 # from auth.auth import AuthHandler
 import uvicorn
 

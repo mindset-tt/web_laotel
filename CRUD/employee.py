@@ -3,7 +3,7 @@ from importlib.metadata import requires
 from starlette.responses import JSONResponse
 from typing import List, Any
 from fastapi import Depends, Form, File, UploadFile
-from config.config_db import app, cursor, auth_handler, conp
+from config.config_db import app, cursor, conp
 from re import match
 # from .department import department_name
 import uuid
